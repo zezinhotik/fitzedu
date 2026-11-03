@@ -1,5 +1,5 @@
 // Fit Evolution — service worker (funciona offline)
-const CACHE = 'fitevolution-v7';
+const CACHE = 'fitevolution-v8';
 const IMG = 'fitevolution-demos';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())); });

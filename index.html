@@ -892,24 +892,105 @@ function vDiet() {
   <div class="grid2" style="margin-top:10px"><button class="btn block" data-act="shop">🛒 Lista de compras</button><button class="btn block" data-act="foods">Alimentos</button></div>
   <p class="foot">Pese os alimentos e confira se o valor é cru ou cozido — isso muda bastante as calorias.</p>`;
 }
+// ---------- catálogo de alimentos ----------
+// Itens comuns de mercado que não estão na TACO (valores típicos de rótulo, por 100 g/ml)
+const MARKET = [
+  ['Linguiça toscana', 230, 15, 1, 19, 'cru', 'g', 'gomo', 80], ['Linguiça toscana grelhada', 296, 21, 1, 23, 'cozido', 'g', 'gomo', 60],
+  ['Linguiça calabresa defumada', 300, 15, 2, 26, 'pronto', 'g', 'gomo', 80], ['Linguiça de frango', 200, 15, 2, 15, 'cru', 'g', 'gomo', 80],
+  ['Salsicha', 257, 12, 3, 22, 'pronto', 'g', 'unidade', 50], ['Salsicha de frango', 220, 12, 4, 17, 'pronto', 'g', 'unidade', 50],
+  ['Peito de peru defumado fatiado', 105, 19, 2, 2, 'pronto', 'g', 'fatia', 15], ['Apresuntado fatiado', 120, 13, 3, 6, 'pronto', 'g', 'fatia', 15],
+  ['Bacon defumado', 470, 15, 0, 46, 'cru', 'g', 'fatia', 10], ['Hambúrguer de frango', 180, 15, 4, 11, 'cru', 'g', 'unidade', 56],
+  ['Frango empanado (nuggets)', 250, 14, 17, 14, 'pronto', 'g', 'unidade', 20], ['Carne moída (patinho) refogada', 220, 30, 0, 11, 'cozido'],
+  ['Tilápia, filé', 96, 20, 0, 1.7, 'cru', 'g', 'filé', 120], ['Tilápia, filé grelhado', 128, 26, 0, 2.7, 'cozido', 'g', 'filé', 100],
+  ['Strogonoff de frango', 160, 13, 4, 10, 'pronto', 'g', 'concha', 120],
+  ['Queijo coalho', 330, 24, 2, 25, 'pronto', 'g', 'espeto', 60], ['Queijo cottage', 98, 11, 3.4, 4.3, 'pronto', 'g', 'colher de sopa', 30],
+  ['Requeijão cremoso', 240, 9, 3, 21, 'pronto', 'g', 'colher de sopa', 30], ['Requeijão light', 180, 11, 4, 13, 'pronto', 'g', 'colher de sopa', 30],
+  ['Cream cheese', 300, 6, 4, 29, 'pronto', 'g', 'colher de sopa', 30], ['Creme de leite (caixinha)', 210, 2.5, 3.5, 20, 'pronto', 'g', 'colher de sopa', 15],
+  ['Iogurte grego tradicional', 130, 5, 15, 6, 'pronto', 'g', 'pote', 100], ['Iogurte proteico (zero lactose/zero açúcar)', 60, 9.4, 4, 0.5, 'pronto', 'g', 'pote', 160],
+  ['Leite semidesnatado', 45, 3.2, 4.8, 1.3, 'pronto', 'ml', 'copo', 200], ['Whey protein concentrado', 400, 75, 10, 6, 'pronto', 'g', 'scoop', 30],
+  ['Achocolatado em pó', 380, 4, 90, 2, 'pronto', 'g', 'colher de sopa', 20],
+  ['Pão de forma tradicional', 260, 9, 48, 3.5, 'pronto', 'g', 'fatia', 25], ['Pão de forma integral', 240, 11, 42, 3.5, 'pronto', 'g', 'fatia', 25],
+  ['Pão de hambúrguer', 270, 9, 49, 4.5, 'pronto', 'g', 'unidade', 50], ['Tapioca (goma hidratada)', 240, 0, 60, 0, 'pronto', 'g', 'tapioca média', 60],
+  ['Cuscuz de milho (flocão) cozido', 112, 2.2, 25, 0.5, 'cozido', 'g', 'fatia', 100], ['Macarrão cozido', 158, 5.8, 31, 0.9, 'cozido', 'g', 'pegador', 110],
+  ['Biscoito de arroz', 380, 8, 80, 3, 'pronto', 'g', 'unidade', 9], ['Torrada integral', 390, 13, 70, 6, 'pronto', 'g', 'unidade', 8],
+  ['Granola tradicional', 420, 9, 68, 12, 'pronto', 'g', 'colher de sopa', 10], ['Barra de cereal', 380, 5, 70, 9, 'pronto', 'g', 'unidade', 22],
+  ['Barra de proteína', 360, 33, 33, 11, 'pronto', 'g', 'unidade', 45], ['Pasta de amendoim integral', 600, 25, 20, 48, 'pronto', 'g', 'colher de sopa', 15],
+  ['Batata palha', 540, 6, 52, 34, 'pronto', 'g', 'punhado', 20], ['Chocolate ao leite', 540, 7, 57, 31, 'pronto', 'g', 'quadradinho', 5],
+  ['Sorvete de creme', 200, 3.5, 25, 9.5, 'pronto', 'g', 'bola', 60], ['Maionese', 300, 0.5, 3, 31, 'pronto', 'g', 'colher de sopa', 12],
+  ['Ketchup', 110, 1, 26, 0.1, 'pronto', 'g', 'colher de sopa', 15], ['Pizza de mussarela', 270, 11, 30, 12, 'pronto', 'g', 'fatia', 110],
+  ['Coxinha frita', 290, 9, 32, 14, 'pronto', 'g', 'unidade', 80], ['Refrigerante cola', 42, 0, 10.6, 0, 'pronto', 'ml', 'lata', 350],
+  ['Refrigerante zero', 0, 0, 0, 0, 'pronto', 'ml', 'lata', 350], ['Cerveja pilsen', 43, 0.4, 3.5, 0, 'pronto', 'ml', 'lata', 350],
+  ['Suco de caixinha (néctar)', 50, 0.2, 12, 0, 'pronto', 'ml', 'copo', 200], ['Açaí na tigela (com xarope)', 110, 0.7, 21.5, 3.7, 'pronto', 'g', 'tigela 300 ml', 300],
+].map(([nome, kcal, p, c, g, estado, base = 'g', un = '', ung = 0], i) => ({ id: 'mk' + i, src: 'mercado', nome, marca: '', kcal, p, c, g, estado, base, un, ung }));
+const TACO_URL = 'https://cdn.jsdelivr.net/gh/isaquetdiniz/taco-api@d91d52ffefde76c222547cdce581a80fd3b12e5f/references/TACO_formatted.json';
+const TACO_KEY = 'fitevolution.taco.v1';
+let TACO = (() => { try { return JSON.parse(localStorage.getItem(TACO_KEY)) || []; } catch (e) { return []; } })();
+const TACO_UNITS = [[/^Ovo, de galinha, inteiro/, 'unidade', 50], [/^Pão, trigo, francês/, 'unidade', 50], [/^Banana/, 'unidade', 70], [/^Arroz.*cozido/, 'colher de servir', 45], [/^Feijão.*cozido/, 'concha', 86], [/^Maçã/, 'unidade', 130], [/^Laranja.*crua/, 'unidade', 140]];
+async function loadTaco() {
+  if (TACO.length || !navigator.onLine) return;
+  try {
+    const d = await (await fetch(TACO_URL)).json(), r1 = v => { const x = parseFloat(v); return isFinite(x) ? Math.round(x * 10) / 10 : 0; };
+    TACO = d.filter(x => isFinite(parseFloat(x.energy_kcal))).map(x => {
+      const n = x.description.replace(/Lingüiça/g, 'Linguiça').replace(/\/\d+ ?minutos/g, '').replace(/\s+/g, ' ').trim();
+      const estado = /\bcru[as]?\b/i.test(n) ? 'cru' : /cozid|grelhad|assad|frit|refogad|ensopad|torrad|braseado/i.test(n) ? 'cozido' : 'pronto';
+      const u = TACO_UNITS.find(t => t[0].test(n));
+      return ['t' + x.id, n, Math.round(r1(x.energy_kcal)), r1(x.protein_g), r1(x.carbohydrate_g), r1(x.lipid_g), estado, /^Bebidas/.test(x.category) ? 'ml' : 'g', u ? u[1] : '', u ? u[2] : 0];
+    });
+    localStorage.setItem(TACO_KEY, JSON.stringify(TACO));
+    if (!$('#sheetWrap').hidden && $('#fq')) $('#fq').dispatchEvent(new Event('input'));
+  } catch (e) { /* tenta de novo depois */ }
+}
+const tacoFood = t => ({ id: t[0], src: 'taco', nome: t[1], marca: '', kcal: t[2], p: t[3], c: t[4], g: t[5], estado: t[6], base: t[7], un: t[8], ung: t[9] });
+function searchFoods(q) {
+  const words = normName(q).split(' ').filter(Boolean);
+  const match = f => { const h = normName(f.nome + ' ' + (f.marca || '')); return words.every(w => h.includes(w)); };
+  const score = f => { const h = normName(f.nome); return (h.startsWith(words[0] || '') ? 0 : 1) + h.length / 200; };
+  const mine = S.foods.filter(match).sort((a, b) => score(a) - score(b));
+  if (!words.length) return { mine: mine.sort((a, b) => a.nome.localeCompare(b.nome)), cat: [] };
+  const myNames = new Set(S.foods.map(f => normName(f.nome)));
+  const cat = [...MARKET, ...TACO.map(tacoFood)].filter(f => !myNames.has(normName(f.nome)) && match(f)).sort((a, b) => score(a) - score(b)).slice(0, 40);
+  return { mine, cat };
+}
 function sheetAddFood(meal, q = '') {
-  const qs = q.toLowerCase();
-  const list = S.foods.filter(f => !qs || (f.nome + ' ' + f.marca).toLowerCase().includes(qs)).sort((a, b) => a.nome.localeCompare(b.nome));
   openSheet(`<h2>Adicionar em ${MEALS.find(m => m.k === meal).n}</h2>
-    <input id="fq" placeholder="Buscar alimento…" value="${esc(q)}" autocomplete="off">
-    <div id="flist" style="margin-top:8px">${foodList(list, meal)}</div>
+    <input id="fq" placeholder="Buscar: linguiça, arroz, iogurte…" value="${esc(q)}" autocomplete="off">
+    <div id="flist" style="margin-top:8px"></div>
     <div class="grid2" style="margin-top:12px"><button class="btn block" data-act="scan" data-m="${meal}">📷 Código de barras</button><button class="btn block" data-act="newFood" data-m="${meal}">+ Novo alimento</button></div>`);
-  const inp = $('#fq');
-  inp.addEventListener('input', () => {
-    const s = inp.value.toLowerCase();
-    $('#flist').innerHTML = foodList(S.foods.filter(f => !s || (f.nome + ' ' + f.marca).toLowerCase().includes(s)).sort((a, b) => a.nome.localeCompare(b.nome)), meal);
-  });
+  const inp = $('#fq'), draw = () => { $('#flist').innerHTML = foodResults(inp.value, meal); };
+  inp.addEventListener('input', draw); draw(); loadTaco();
 }
-function foodList(list, meal) {
-  if (!list.length) return '<div class="empty">Nenhum alimento encontrado.</div>';
-  return list.map(f => `<button class="list-it" data-act="pickFood" data-id="${f.id}" data-m="${meal}"><div class="grow"><div style="font-weight:600">${esc(f.nome)}<span class="tag ${f.estado === 'cozido' ? 'ac' : ''}">${f.estado}</span></div>
-    <div class="small muted">${f.marca ? esc(f.marca) + ' · ' : ''}${fmt(f.kcal)} kcal · P ${fmt(f.p, 1)} · C ${fmt(f.c, 1)} · G ${fmt(f.g, 1)} / 100 ${f.base}</div></div><span class="muted">›</span></button>`).join('');
+function foodRow(f, meal, act) {
+  const tag = f.src === 'taco' ? '<span class="tag">TACO</span>' : f.src === 'mercado' ? '<span class="tag">mercado</span>' : f.src === 'off' ? '<span class="tag ac">marca</span>' : '';
+  return `<button class="list-it" data-act="${act}" data-id="${f.id}" data-m="${meal}"><div class="grow"><div style="font-weight:600">${esc(f.nome)}${tag}${f.estado !== 'pronto' ? `<span class="tag ${f.estado === 'cozido' ? 'ac' : ''}">${f.estado}</span>` : ''}</div>
+    <div class="small muted">${f.marca ? esc(f.marca) + ' · ' : ''}${fmt(f.kcal)} kcal · P ${fmt(f.p, 1)} · C ${fmt(f.c, 1)} · G ${fmt(f.g, 1)} / 100 ${f.base}</div></div><span class="muted">›</span></button>`;
 }
+function foodResults(q, meal) {
+  const { mine, cat } = searchFoods(q), qs = q.trim();
+  let h = '';
+  if (mine.length) h += `${qs ? '<div class="eyebrow" style="margin:8px 0 2px">Meus alimentos</div>' : ''}${mine.slice(0, qs ? 15 : 60).map(f => foodRow(f, meal, 'pickFood')).join('')}`;
+  if (cat.length) h += `<div class="eyebrow" style="margin:12px 0 2px">Tabela de alimentos</div>${cat.map(f => foodRow(f, meal, 'pickCat')).join('')}`;
+  if (qs && !mine.length && !cat.length) h += `<div class="empty">Nada encontrado para “${esc(qs)}”.${!TACO.length ? '<br>Carregando a tabela completa… (precisa de internet na primeira vez)' : ''}</div>`;
+  if (qs.length >= 3) h += `<button class="btn block" style="margin-top:10px" data-act="offSearch" data-m="${meal}">🔎 Buscar marcas de mercado “${esc(qs)}”</button>`;
+  else if (!qs) h += `<p class="small muted" style="margin:10px 2px 0">Digite para buscar em mais de 650 alimentos (tabela TACO + itens de mercado) ou em marcas pela internet.</p>`;
+  return h;
+}
+async function offSearch(meal) {
+  const q = $('#fq').value.trim(), box = $('#flist');
+  box.innerHTML = '<div class="empty">Buscando marcas…</div>';
+  try {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&json=1&page_size=30&tagtype_0=countries&tag_contains_0=contains&tag_0=brazil&fields=code,product_name,product_name_pt,brands,nutriments,serving_quantity`;
+    const d = await (await fetch(url)).json(), r1 = v => v == null || v === '' ? 0 : Math.round(+v * 10) / 10;
+    OFF_RES = (d.products || []).filter(p => p.nutriments && p.nutriments['energy-kcal_100g'] != null && (p.product_name_pt || p.product_name)).map(p => {
+      const n = p.nutriments;
+      return { id: 'off' + p.code, ean: p.code, src: 'off', nome: (p.product_name_pt || p.product_name).trim(), marca: (p.brands || '').split(',')[0].trim(), kcal: Math.round(+n['energy-kcal_100g']), p: r1(n.proteins_100g), c: r1(n.carbohydrates_100g), g: r1(n.fat_100g), estado: 'pronto', base: 'g', un: p.serving_quantity ? 'porção' : '', ung: p.serving_quantity ? Math.round(+p.serving_quantity) : 0 };
+    });
+    box.innerHTML = OFF_RES.length ? `<div class="eyebrow" style="margin:8px 0 2px">Marcas encontradas</div>${OFF_RES.map(f => foodRow(f, meal, 'pickCat')).join('')}<p class="small muted" style="margin:8px 2px 0">Dados enviados por usuários do Open Food Facts — confira com o rótulo.</p>`
+      : `<div class="empty">Nenhuma marca encontrada. Tente outro nome ou use o código de barras.</div>`;
+  } catch (e) { box.innerHTML = `<div class="empty">${navigator.onLine ? 'Não foi possível buscar agora. Tente de novo em instantes.' : 'Sem internet.'}</div>`; }
+}
+let OFF_RES = [];
+function catFood(id) { return MARKET.find(f => f.id === id) || OFF_RES.find(f => f.id === id) || (TACO.find(t => t[0] === id) && tacoFood(TACO.find(t => t[0] === id))); }
+function foodList(list, meal) { return list.length ? list.map(f => foodRow(f, meal, 'pickFood')).join('') : '<div class="empty">Nenhum alimento encontrado.</div>'; }
 function sheetQty({ food, meal, item }) {
   const base = food ? food.base : item.base || 'g';
   const per = food || item;
@@ -1404,6 +1485,12 @@ const A = {
   closeSheet: () => closeSheet(),
   addFood: ds => sheetAddFood(ds.m),
   pickFood: ds => sheetQty({ food: S.foods.find(f => f.id === ds.id), meal: ds.m }),
+  pickCat: ds => {
+    const c = catFood(ds.id); if (!c) return;
+    const { src, ...rest } = c, f = { ...rest, id: uid(), ean: c.ean || '' };
+    S.foods.push(f); save(false); sheetQty({ food: f, meal: ds.m });
+  },
+  offSearch: ds => offSearch(ds.m),
   newFood: ds => sheetFoodForm(null, ds.m),
   editFood: ds => sheetFoodForm(ds.id),
   delFood: ds => confirmSheet('Excluir alimento?', 'Registros antigos do diário não são afetados.', 'Excluir', () => { S.foods = S.foods.filter(f => f.id !== ds.id); save(); sheetFoods(); }),
@@ -1553,6 +1640,7 @@ setInterval(() => { if (!document.hidden) sync(); }, 60000);
 if (syncOn()) { setSyncDot('ok'); sync(); } else showLogin();
 
 loadPhotos().then(() => render(true));
+setTimeout(loadTaco, 3000);
 render(true);
 
 </script>

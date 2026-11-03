@@ -241,6 +241,32 @@ html[data-theme="pink"] .tabbar{background:rgba(20,14,17,.96)}
 .sync-dot.ok{display:block;background:var(--ac)}
 .sync-dot.busy{display:block;background:var(--c);animation:fade .8s infinite alternate}
 .sync-dot.err{display:block;background:var(--bad)}
+.login{position:fixed;inset:0;z-index:80;overflow:auto;background:radial-gradient(120% 70% at 50% -10%,var(--ac-bg),transparent 60%),var(--bg);display:flex;align-items:center;justify-content:center;padding:24px 20px calc(24px + var(--safe-b))}
+.login[hidden]{display:none}
+body.locked{overflow:hidden}
+body.locked .tabbar,body.locked .topbar{visibility:hidden}
+.lg-box{width:100%;max-width:400px}
+.lg-logo{display:flex;align-items:center;gap:9px;font-size:22px;margin-bottom:34px}
+.lg-logo b{color:var(--ac)}
+.lg-logo .logo-dot{width:14px;height:14px;border-radius:4px}
+.lg-h{font-size:27px;line-height:1.15;margin-bottom:8px}
+.lg-p{color:var(--mu);margin:0 0 24px}
+.lg-pw{position:relative}
+.lg-pw input{padding-right:46px}
+.lg-pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:9px;opacity:.6}
+.lg-err{color:var(--bad);font-size:13.5px;min-height:20px;margin:-2px 0 10px}
+.lg-go{padding:14px;font-size:16px;border-radius:14px}
+.lg-go:disabled{opacity:.6}
+.lg-link{display:block;margin:18px auto 0;color:var(--ac);font-weight:600;font-size:14px}
+.lg-foot{text-align:center;color:var(--mu2);font-size:12px;margin-top:30px}
+.lg-who{display:grid;gap:12px}
+.lg-who button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:18px;border-radius:18px;border:1px solid var(--line);background:var(--s1);text-align:left;position:relative}
+.lg-who button .av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#0b0d0c;margin-bottom:10px}
+.lg-who button .av.g{background:#b6ff3b}.lg-who button .av.p{background:#ff5fa2;color:#1a0b12}
+.lg-who button b{font-size:18px}
+.lg-who button small{color:var(--mu)}
+.lg-who button.g:active,.lg-who button.g:hover{border-color:#b6ff3b}
+.lg-who button.p:active,.lg-who button.p:hover{border-color:#ff5fa2}
 .foot{color:var(--mu2);font-size:11.5px;text-align:center;margin:18px 8px 0}
 body:has(#rest:not([hidden])) .toast{bottom:calc(var(--nav) + 86px + var(--safe-b))}
 
@@ -276,6 +302,7 @@ body:has(#rest:not([hidden])) .toast{bottom:calc(var(--nav) + 86px + var(--safe-
   <div class="sheet-bg" data-act="closeSheet"></div>
   <div id="sheet" class="sheet" role="dialog" aria-modal="true"></div>
 </div>
+<div id="login" class="login" hidden></div>
 <div id="toast" class="toast" hidden></div>
 <input type="file" id="filePhoto" accept="image/*" hidden>
 <input type="file" id="fileImport" accept="application/json,.json" hidden>
@@ -498,7 +525,10 @@ function setSession(d) {
 }
 async function token() {
   if (!SY.refresh_token) throw new Error('Sem login');
-  if (!SY.access_token || Date.now() > SY.expires_at - 60000) setSession(await sbAuth('token?grant_type=refresh_token', { refresh_token: SY.refresh_token }));
+  if (!SY.access_token || Date.now() > SY.expires_at - 60000) {
+    try { setSession(await sbAuth('token?grant_type=refresh_token', { refresh_token: SY.refresh_token })); }
+    catch (e) { if (/refresh token|invalid|not found|revoked/i.test(e.message)) { logout(); throw new Error('Sessão expirada — entre novamente'); } throw e; }
+  }
   return SY.access_token;
 }
 async function sbRest(path, opt = {}) {
@@ -532,26 +562,62 @@ async function sync(manual) {
 }
 function setSyncDot(st) { const d = $('#syncDot'); if (!d) return; d.className = 'sync-dot ' + (syncOn() ? st : ''); d.title = st === 'err' ? 'Erro na sincronização' : 'Sincronizado'; }
 function syncCard() {
-  const has = sbUrl() && sbKey();
-  if (syncOn()) return `<div class="card"><h3>Sincronização <small class="${SY.err ? 'bad' : 'ac'}">${SY.err ? 'com erro' : 'ligada'}</small></h3>
-    <p class="small muted" style="margin:0 0 10px">Conta da família: <b style="color:var(--tx)">${esc(SY.email || '')}</b><br>${SY.last ? `Última sincronização: ${shortDate(today())} às ${new Date(SY.last).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'Ainda não sincronizado'}${SY.err ? `<br><span class="bad">${esc(SY.err)}</span>` : ''}</p>
-    <div class="grid2"><button class="btn pri" data-act="syncNow">Sincronizar agora</button><button class="btn" data-act="syncOut">Sair</button></div>
-    <p class="small muted" style="margin:10px 0 0">Dieta, treinos, medidas e metas dos dois perfis vão para a nuvem. As fotos ficam só no celular.</p></div>`;
-  return `<div class="card"><h3>Sincronização <small>desligada</small></h3>
-    <p class="small muted" style="margin:0 0 10px">Use a mesma conta da família nos dois celulares. Cada um escolhe o seu perfil, e os dados ficam salvos na nuvem.</p>
-    ${!SB_DEFAULT.url ? `<div class="fld"><label>URL do projeto Supabase</label><input id="sb_url" value="${esc(SY.url || '')}" placeholder="https://xxxx.supabase.co" autocapitalize="off"></div>
-    <div class="fld"><label>Chave pública (anon key)</label><input id="sb_key" value="${esc(SY.key || '')}" autocapitalize="off"></div>` : ''}
-    <div class="fld"><label>E-mail da família</label><input id="sb_em" type="email" value="${esc(SY.email || '')}" autocapitalize="off"></div>
-    <div class="fld"><label>Senha</label><input id="sb_pw" type="password"></div>
-    <div class="grid2"><button class="btn pri" data-act="syncIn">Entrar</button><button class="btn" data-act="syncUp">Criar conta</button></div>
-    ${has ? '' : '<p class="small muted" style="margin:10px 0 0">Veja o passo a passo no arquivo SINCRONIZACAO.txt.</p>'}</div>`;
+  if (!syncOn()) return '';
+  return `<div class="card"><h3>Conta e sincronização <small class="${SY.err ? 'bad' : 'ac'}">${SY.err ? 'com erro' : 'ligada'}</small></h3>
+    <p class="small muted" style="margin:0 0 10px">Conta da família: <b style="color:var(--tx)">${esc(SY.email || '')}</b><br>${SY.last ? `Última sincronização: hoje às ${new Date(SY.last).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'Ainda não sincronizado'}${SY.err ? `<br><span class="bad">${esc(SY.err)}</span>` : ''}</p>
+    <div class="grid2"><button class="btn pri" data-act="syncNow">Sincronizar agora</button><button class="btn" data-act="syncOut">Sair da conta</button></div>
+    <p class="small muted" style="margin:10px 0 0">Dieta, treinos, medidas e metas dos dois perfis ficam salvos na nuvem. As fotos ficam só no celular.</p></div>`;
 }
-function readSyncForm() {
-  if ($('#sb_url')) { SY.url = $('#sb_url').value.trim(); SY.key = $('#sb_key').value.trim(); }
-  const em = $('#sb_em').value.trim(), pw = $('#sb_pw').value;
-  if (!sbUrl() || !sbKey()) { toast('Preencha a URL e a chave do Supabase'); return null; }
-  if (!em || pw.length < 6) { toast('E-mail e senha (mín. 6 caracteres)'); return null; }
-  syncSave(); return { email: em, password: pw };
+// ---------- tela de login ----------
+const LG = { mode: 'in', step: 'cred' };
+function showLogin(step = 'cred') {
+  LG.step = step; const el = $('#login'); el.hidden = false; document.body.classList.add('locked');
+  document.documentElement.dataset.theme = step === 'who' ? PROFILES[CUR].theme : 'green';
+  if (step === 'who') {
+    el.innerHTML = `<div class="lg-box"><div class="lg-logo"><span class="logo-dot"></span>Fit <b>Evolution</b></div>
+      <h1 class="lg-h">Quem vai usar este celular?</h1><p class="lg-p">Você pode trocar depois na tela inicial.</p>
+      <div class="lg-who">${Object.entries(PROFILES).map(([k, v]) => `<button data-act="loginWho" data-k="${k}" class="${v.av}"><span class="av ${v.av}">${v.ini}</span><b>Sou ${v.nome}</b><small>${v.sub}</small></button>`).join('')}</div></div>`;
+    return;
+  }
+  const up = LG.mode === 'up';
+  el.innerHTML = `<div class="lg-box"><div class="lg-logo"><span class="logo-dot"></span>Fit <b>Evolution</b></div>
+    <h1 class="lg-h">${up ? 'Criar conta da família' : 'Bem-vindos de volta'}</h1>
+    <p class="lg-p">${up ? 'Crie uma única conta para vocês dois. Depois é só usar o mesmo e-mail e senha no outro celular.' : 'Entre com o e-mail e a senha da família.'}</p>
+    <form id="lg_form" autocomplete="on">
+      <div class="fld"><label>E-mail</label><input id="lg_em" type="email" autocomplete="username" autocapitalize="off" value="${esc(SY.email || '')}" placeholder="seuemail@exemplo.com"></div>
+      <div class="fld"><label>Senha</label><div class="lg-pw"><input id="lg_pw" type="password" autocomplete="${up ? 'new-password' : 'current-password'}" placeholder="${up ? 'mínimo 6 caracteres' : '••••••'}"><button type="button" data-act="lgEye" aria-label="Mostrar senha">👁</button></div></div>
+      ${up ? `<div class="fld"><label>Confirmar senha</label><input id="lg_pw2" type="password" autocomplete="new-password"></div>` : ''}
+      <div id="lg_err" class="lg-err"></div>
+      <button class="btn pri block lg-go" type="submit" id="lg_go">${up ? 'Criar conta e entrar' : 'Entrar'}</button>
+    </form>
+    <button class="lg-link" data-act="lgMode">${up ? 'Já temos conta — entrar' : 'Primeiro acesso? Criar conta da família'}</button>
+    <p class="lg-foot">Acesso só para a família. Seus dados ficam protegidos na nuvem.</p></div>`;
+  $('#lg_form').onsubmit = e => { e.preventDefault(); doLogin(); };
+}
+function hideLogin() { $('#login').hidden = true; document.body.classList.remove('locked'); applyTheme(); render(true); }
+async function doLogin() {
+  const em = $('#lg_em').value.trim(), pw = $('#lg_pw').value, err = $('#lg_err'), btn = $('#lg_go');
+  err.textContent = '';
+  if (!/^\S+@\S+\.\S+$/.test(em)) return err.textContent = 'Digite um e-mail válido.';
+  if (pw.length < 6) return err.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+  if (LG.mode === 'up' && pw !== $('#lg_pw2').value) return err.textContent = 'As senhas não conferem.';
+  if (!navigator.onLine) return err.textContent = 'Sem internet. Conecte-se para entrar.';
+  btn.disabled = true; btn.textContent = 'Aguarde…';
+  try {
+    const d = LG.mode === 'up' ? await sbAuth('signup', { email: em, password: pw }) : await sbAuth('token?grant_type=password', { email: em, password: pw });
+    if (!setSession(d)) throw new Error('Conta criada, mas é preciso confirmar o e-mail antes de entrar.');
+    await sync(); showLogin('who');
+  } catch (e) {
+    const m = e.message || '';
+    err.textContent = /invalid login|invalid_credentials|invalid grant/i.test(m) ? 'E-mail ou senha incorretos.'
+      : /signups? not allowed|signup.*disabled/i.test(m) ? 'Cadastro fechado. Use o e-mail e a senha da família.'
+      : /already registered|already exists/i.test(m) ? 'Essa conta já existe. Toque em "Já temos conta — entrar".'
+      : /confirm/i.test(m) ? 'Confirme o e-mail antes de entrar.' : 'Não foi possível entrar: ' + m;
+    btn.disabled = false; btn.textContent = LG.mode === 'up' ? 'Criar conta e entrar' : 'Entrar';
+  }
+}
+function logout() {
+  SY = { email: SY.email }; syncSave(); setSyncDot(''); LG.mode = 'in'; showLogin();
 }
 
 // ---------- fotos (IndexedDB) ----------
@@ -1375,9 +1441,10 @@ const A = {
   swapDo: ds => { const it = S.diary[UI.dDate][ds.m].find(i => i.id === ds.id), f = S.foods.find(x => x.id === ds.f); if (!it || !f) return; Object.assign(it, { fid: f.id, n: f.nome + (f.marca ? ` (${f.marca})` : ''), q: +ds.q, base: f.base, kcal: f.kcal, p: f.p, c: f.c, g: f.g }); save(); closeSheet(); render(); toast('Trocado'); },
   shop: () => sheetShop(),
   syncNow: () => sync(true),
-  syncIn: async () => { const c = readSyncForm(); if (!c) return; try { setSession(await sbAuth('token?grant_type=password', c)); toast('Conectado!'); await sync(true); render(); } catch (e) { toast(/invalid/i.test(e.message) ? 'E-mail ou senha incorretos' : /confirm/i.test(e.message) ? 'Confirme o e-mail antes de entrar' : 'Erro: ' + e.message); } },
-  syncUp: async () => { const c = readSyncForm(); if (!c) return; try { const d = await sbAuth('signup', c); if (setSession(d)) { toast('Conta criada e conectada!'); await sync(true); } else toast('Conta criada! Confirme pelo e-mail e depois toque em Entrar.'); render(); } catch (e) { toast('Erro: ' + e.message); } },
-  syncOut: () => confirmSheet('Sair da sincronização?', 'Os dados continuam neste celular, mas param de ir para a nuvem.', 'Sair', () => { SY = { url: SY.url, key: SY.key, email: SY.email }; syncSave(); setSyncDot(''); render(); }),
+  syncOut: () => confirmSheet('Sair da conta?', 'Para usar o app de novo será preciso entrar com o e-mail e a senha da família.', 'Sair', async () => { await sync(); logout(); }),
+  lgMode: () => { LG.mode = LG.mode === 'up' ? 'in' : 'up'; showLogin(); },
+  lgEye: () => { ['#lg_pw', '#lg_pw2'].forEach(s => { const i = $(s); if (i) i.type = i.type === 'password' ? 'text' : 'password'; }); },
+  loginWho: async ds => { if (ds.k !== CUR) { CUR = ds.k; try { localStorage.setItem(ACTIVE_KEY, CUR); } catch (e) { } S = load(CUR); save(false); await loadPhotos(); } hideLogin(); toast(`Olá, ${PROFILES[CUR].nome}!`); },
   scan: ds => sheetScan(ds.m),
   report: ds => sheetReport(ds && ds.ws),
   water: ds => { const x = ((S.daily ||= {})[today()] ||= {}); x.agua = Math.max(0, (x.agua || 0) + +ds.n); save(); const y = scrollY; render(); scrollTo(0, y); },
@@ -1483,7 +1550,7 @@ let lastDay = today();
 document.addEventListener('visibilitychange', () => { if (document.hidden) return; if (today() !== lastDay) { lastDay = today(); UI.dDate = UI.tDate = lastDay; render(); } sync(); });
 window.addEventListener('online', () => sync());
 setInterval(() => { if (!document.hidden) sync(); }, 60000);
-setSyncDot('ok'); sync();
+if (syncOn()) { setSyncDot('ok'); sync(); } else showLogin();
 
 loadPhotos().then(() => render(true));
 render(true);

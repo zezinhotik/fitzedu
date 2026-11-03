@@ -1,13 +1,7 @@
-FIT EVOLUTION — SINCRONIZAÇÃO (já configurada)
+FIT EVOLUTION — PRIMEIRO ACESSO
 
-O projeto Supabase já está pronto e a URL/chave estão dentro do app.
-
-No seu celular:
-  1. Abra o app > Sou Eduardo > Ajustes > Sincronização.
-  2. Digite um e-mail e uma senha da família e toque em "Criar conta".
-
-No celular da Geovana:
-  1. Abra o app > Sou Geovana > Ajustes > Sincronização.
-  2. Use o MESMO e-mail e senha e toque em "Entrar".
-
-As fotos continuam só no celular de cada um.
+1. Suba index.html e sw.js no GitHub (a Vercel publica sozinha).
+2. No seu celular: abra o app > "Primeiro acesso? Criar conta da família" >
+   e-mail + senha (2x) > "Criar conta e entrar" > "Sou Eduardo".
+3. No celular da Geovana: abra o app > mesmo e-mail e senha > "Entrar" > "Sou Geovana".
+4. Avise o Claude para bloquear novos cadastros no Supabase. Depois disso, só essa conta entra.

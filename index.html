@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d0c">
+<meta name="description" content="Fit Evolution — dieta, treino, cardio e evolução para recomposição corporal.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Fit Evolution</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo-dot"></span>Fit <b>Evolution</b></div>
+  <div id="topSub" class="top-sub"></div>
+</header>
+
+<main id="view"></main>
+
+<div id="rest" class="rest" hidden>
+  <div class="rest-fill"></div>
+  <div class="rest-row">
+    <span class="rest-l">Descanso</span>
+    <span class="rest-t">0:00</span>
+    <button data-act="restAdd">+15s</button>
+    <button data-act="restStop">Pular</button>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></button>
+  <button data-tab="diet"><svg viewBox="0 0 24 24"><path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M17 3c-2 0-3 3-3 6s1 4 3 4v8"/></svg><span>Dieta</span></button>
+  <button data-tab="train"><svg viewBox="0 0 24 24"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg><span>Treino</span></button>
+  <button data-tab="prog"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l5-6 4 3 6-8"/></svg><span>Evolução</span></button>
+  <button data-tab="more"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Ajustes</span></button>
+</nav>
+
+<div id="sheetWrap" class="sheet-wrap" hidden>
+  <div class="sheet-bg" data-act="closeSheet"></div>
+  <div id="sheet" class="sheet" role="dialog" aria-modal="true"></div>
+</div>
+<div id="toast" class="toast" hidden></div>
+<input type="file" id="filePhoto" accept="image/*" hidden>
+<input type="file" id="fileImport" accept="application/json,.json" hidden>
+
+<script src="app.js"></script>
+</body>
+</html>

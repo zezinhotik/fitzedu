@@ -1,0 +1,13 @@
+FIT EVOLUTION — como instalar no Android
+
+O app precisa estar num endereço HTTPS para ser instalado. Jeito mais rápido (grátis):
+
+1. Acesse https://app.netlify.com/drop no computador.
+2. Arraste esta pasta inteira (fit-evolution) para a página.
+3. O Netlify gera um link (ex.: https://algo.netlify.app). Abra esse link no Chrome do celular.
+4. Menu (⋮) > "Instalar app" (ou "Adicionar à tela inicial").
+
+Alternativa: GitHub Pages (suba a pasta num repositório e ative Pages).
+
+Arquivos: index.html, style.css, app.js, manifest.webmanifest, sw.js, icons/
+Os dados ficam só no celular. Use Ajustes > Exportar backup de vez em quando.

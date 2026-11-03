@@ -477,12 +477,12 @@ function calcGoals({ sexo, idade, altura, peso, ativ, obj }) {
 
 // ---------- sincronização (Supabase) ----------
 // Preencha aqui para não precisar digitar no celular (opcional):
-const SB_DEFAULT = { url: '', key: '' };
+const SB_DEFAULT = { url: 'https://zubchxiwdduxefgvghiq.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1YmNoeGl3ZGR1eGVmZ3ZnaGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MDc5OTgsImV4cCI6MjEwOTI4Mzk5OH0.2RDa56hLcjqFpDQQyB05gPq9BRgR0bwrRzCqWxZdex4' };
 const SYNC_KEY = 'fitevolution.sync';
 let SY = (() => { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || {}; } catch (e) { return {}; } })();
 const syncSave = () => { try { localStorage.setItem(SYNC_KEY, JSON.stringify(SY)); } catch (e) { } };
-const sbUrl = () => (SY.url || SB_DEFAULT.url || '').replace(/\/+$/, '');
-const sbKey = () => SY.key || SB_DEFAULT.key || '';
+const sbUrl = () => (SB_DEFAULT.url || SY.url || '').replace(/\/+$/, '');
+const sbKey = () => SB_DEFAULT.key || SY.key || '';
 const syncOn = () => !!(sbUrl() && sbKey() && SY.refresh_token);
 let pushT = null, syncBusy = false;
 async function sbAuth(path, body) {

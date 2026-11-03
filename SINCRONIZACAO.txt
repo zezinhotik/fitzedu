@@ -1,0 +1,39 @@
+FIT EVOLUTION — LIGAR A SINCRONIZAÇÃO (uma vez só, ~5 minutos)
+
+1) CRIAR O PROJETO
+   - Acesse https://supabase.com e crie uma conta grátis (pode entrar com o GitHub).
+   - Clique em "New project". Nome: fit-evolution. Crie uma senha do banco (guarde) e
+     escolha a região "South America (São Paulo)". Aguarde ~2 min.
+
+2) CRIAR A TABELA
+   - No menu da esquerda: SQL Editor > New query. Cole o texto abaixo e clique em RUN:
+
+create table if not exists public.fit_state (
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  profile text not null,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, profile)
+);
+alter table public.fit_state enable row level security;
+create policy "familia le e grava os proprios dados" on public.fit_state
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+3) (RECOMENDADO) DESLIGAR A CONFIRMAÇÃO DE E-MAIL
+   - Authentication > Sign In / Providers > Email > desmarque "Confirm email" > Save.
+     (Se deixar ligado, confirme o e-mail que chegar antes de entrar no app.)
+
+4) PEGAR A URL E A CHAVE
+   - Project Settings > Data API (ou API): copie a "Project URL" (https://xxxx.supabase.co)
+   - API Keys: copie a chave "anon public" (ou "publishable").
+   - NUNCA use a chave "service_role"/"secret" no app.
+
+5) NO APP (no seu celular)
+   - Ajustes > Sincronização: cole a URL e a chave, digite um e-mail e uma senha
+     da família e toque em "Criar conta".
+   - No celular da Geovana: abra o app, toque em "Sou Geovana", vá em Ajustes >
+     Sincronização, cole a mesma URL e chave, use o MESMO e-mail e senha e toque em "Entrar".
+
+Pronto: cada um usa seu perfil no próprio celular, os dados ficam na nuvem e o card
+"Juntos" mostra o progresso dos dois. As fotos continuam só no celular de cada um.
+Dica: se me mandar a URL e a chave anon, eu deixo elas fixas no app para ninguém precisar digitar.

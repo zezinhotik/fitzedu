@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#0b0d0c">
 <meta name="description" content="Fit Evolution — dieta, treino, cardio e evolução para recomposição corporal.">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -269,6 +269,33 @@ body.locked .tabbar,body.locked .topbar{visibility:hidden}
 .lg-who button.p:active,.lg-who button.p:hover{border-color:#ff5fa2}
 .foot{color:var(--mu2);font-size:11.5px;text-align:center;margin:18px 8px 0}
 body:has(#rest:not([hidden])) .toast{bottom:calc(var(--nav) + 86px + var(--safe-b))}
+
+/* ---------- ajustes mobile / teclado ---------- */
+:root{--kb:0px;--vvh:100dvh}
+input,select,textarea{font-size:16px}
+button,a,label,.chk{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+.sheet{bottom:var(--kb);max-height:calc(var(--vvh) - 24px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transition:bottom .15s}
+body.kb .tabbar,body.kb .rest{display:none}
+body.kb main{padding-bottom:45vh}
+body.kb .sheet{padding-bottom:16px;max-height:calc(var(--vvh) - 12px)}
+body.kb .toast{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto}
+body.kb .grab{display:none}
+.login{padding-bottom:calc(24px + var(--kb))}
+body.kb .login{align-items:flex-start}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ---------- modo divertido ---------- */
+.fun-h{font-size:22px;line-height:1.25}
+.fun-q{display:block;width:100%;text-align:left;margin:0 0 12px;padding:14px 16px;border-radius:var(--r);background:linear-gradient(135deg,var(--ac-bg),rgba(196,161,255,.10));border:1px solid var(--ac-line);position:relative;overflow:hidden}
+.fun-q .fun-l{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);font-weight:700;margin-bottom:4px}
+.fun-q b{display:block;font-size:17px;line-height:1.35}
+.fun-q small{display:block;color:var(--mu);font-size:11.5px;margin-top:6px}
+.fun-q.pop b{animation:qpop .35s ease}
+@keyframes qpop{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden}
+.confetti span{position:absolute;top:-40px;animation:fall 2.4s cubic-bezier(.3,.6,.4,1) forwards}
+@keyframes fall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(110vh) rotate(540deg);opacity:.9}}
 
 </style>
 </head>
@@ -730,6 +757,49 @@ function lineChart(series, { h = 180, d = 1 } = {}) {
   return `<svg viewBox="0 0 ${W} ${H}" class="chart">${g}${xl}${paths}</svg>`;
 }
 
+// ---------- modo divertido ----------
+const FUN = {
+  greet: {
+    m: ['Bom diaaa, Geo! ☀️ Tá pronta pro shape??', 'Acorda, Geo! O glúteo não vai se levantar sozinho 🍑', 'Bom dia, musa! Café, foco e agachamento ☕🔥', 'Oii Geo! Hoje o espelho vai se apaixonar 🪞💖'],
+    t: ['Oii Geo, tá pronta pro shape?? 💖', 'E aí, musa? Bora fazer o dia valer 💪', 'Oiê, Geo! O treino tá te esperando 👀🍑', 'Geo na área! Shape em modo turbo 🚀'],
+    n: ['Boa noite, Geo! Já deu orgulho hoje? ✨', 'Oii Geo! Fecha o dia com chave de ouro 💅', 'Boa noite, musa! Descansa que amanhã tem mais 🌙🍑'],
+  },
+  quotes: [
+    'Bumbum igual Luísa Sonza ativado!! 🍑🔥', 'Modo shape do verão: carregando… 87% ⏳', 'Hoje tem agachamento e tem fé 🙏🍑',
+    'Glúteo na nuca é só questão de tempo 😂', 'Cada série é um like no seu futuro eu 💖', 'A legging já pediu pra ser usada hoje 👖✨',
+    'Não é sorte, é hip thrust 💅', 'A balança que lute, a gente tá focada 😤', 'Deus no comando e a abdutora no talo 🙌',
+    'Bumbum em construção 🚧 desculpe o transtorno', 'Shape não vem por Pix, vem por série 💸➡️💪', 'Musa fitness em atualização… não desligue ⬆️',
+    'Respira, bebe água e vai pro leg press 💧', 'Se o glúteo não doer amanhã, foi passeio 😂', 'O verão tá chegando e a Geo tá preparada ☀️🍑',
+    'Proteína no prato, foco no shape, Geo no topo 👑', 'Glúteo trabalhado é glúteo abençoado ✨', 'Treino pago, alma lavada 🧼💪',
+    'Cardio hoje = vestidinho curto amanhã 👗', 'Foco, força e fé… e um quadradinho de chocolate 🍫😅', 'Hoje o espelho vai pedir autógrafo 📸',
+    'Quem treina glúteo não perde a pose 💃', 'Rainha do hip thrust, princesa do cardio 👑🏃‍♀️', 'Disciplina hoje, biquíni sem medo amanhã 👙',
+  ],
+  set: ['Mais uma! 🍑', 'Isso, Geo! 🔥', 'O glúteo sentiu essa 😮‍💨', 'Tá voando! ✨', 'Série linda, musa 💅', 'Respira e vem a próxima 💖', 'Uau, que força! 💪', 'O shape agradece 🙏'],
+  exDone: ['Exercício DESTRUÍDO! 💥', 'Check! Próximo, musa 💅', 'Esse aí já era 🔥🍑'],
+  done: ['TREINO CONCLUÍDO! 🍑🔥 O bumbum agradece!', 'Acabou! Musa fitness oficial 👑💖', 'Treino pago com sucesso! 💸💪'],
+  water: ['Hidratada e poderosa 💧✨', 'Pele de pêssego carregando 🍑💧', 'Glub glub, musa! 💦'],
+  weight: ['Anotado! Foco na média, não no número 😉', 'Registrado! A gente olha a tendência, musa 📈💖'],
+  cardio: ['Cardio feito, shape agradece 🏃‍♀️💨', 'Queimou bonito! 🔥', 'Coração forte, bumbum durinho 💓🍑'],
+  food: ['Anotado! Proteína é amiga do bumbum 🍗🍑', 'Diário em dia, Geo arrasando 📒✨', 'Anotadinho! 💖'],
+};
+const funOn = () => S.prefs.fun ?? (CUR === 'geovana');
+const pickF = a => a[Math.floor(Math.random() * a.length)];
+const funQuotes = () => [...FUN.quotes, ...((S.prefs.funQuotes || []).filter(Boolean))];
+function dailyQuote() { const q = funQuotes(), d = parse(today()); const seed = d.getFullYear() * 400 + d.getMonth() * 32 + d.getDate(); return q[(seed + (UI.qOff || 0)) % q.length]; }
+function funToast(kind, fallback) { toast(funOn() ? pickF(FUN[kind]) : fallback); }
+function celebrate(emojis = ['🍑', '💖', '🔥', '✨', '💪', '🎉']) {
+  const box = document.createElement('div'); box.className = 'confetti';
+  for (let i = 0; i < 34; i++) { const sp = document.createElement('span'); sp.textContent = pickF(emojis); sp.style.left = Math.random() * 100 + 'vw'; sp.style.animationDelay = Math.random() * 0.6 + 's'; sp.style.fontSize = 18 + Math.random() * 20 + 'px'; box.appendChild(sp); }
+  document.body.appendChild(box); navigator.vibrate?.([60, 40, 60, 40, 120]); setTimeout(() => box.remove(), 3200);
+}
+const GREET_KEY = 'fitevolution.greet';
+function funGreeting() {
+  const h = new Date().getHours(), per = h < 12 ? 'm' : h < 18 ? 't' : 'n';
+  let g; try { g = JSON.parse(sessionStorage.getItem(GREET_KEY)); } catch (e) { }
+  if (!g || g.per !== per || g.pid !== CUR) { g = { per, pid: CUR, txt: pickF(FUN.greet[per]) }; try { sessionStorage.setItem(GREET_KEY, JSON.stringify(g)); } catch (e) { } }
+  return g.txt;
+}
+
 // ---------- INÍCIO ----------
 function vHome() {
   const t = today(), tot = sum(dayItems(t)), dow = parse(t).getDay(), plan = S.plan[dow];
@@ -755,7 +825,9 @@ function vHome() {
 
   return `
   ${who}
-  <div class="hello"><h1>${greet}${nome}</h1><p>${esc(S.profile.foco || '')}</p></div>
+  ${funOn() ? `<div class="hello"><h1 class="fun-h">${esc(funGreeting())}</h1><p>${esc(S.profile.foco || '')}</p></div>
+  <button class="fun-q" data-act="nextQuote"><span class="fun-l">Frase do dia ✨</span><b>${esc(dailyQuote())}</b><small>toque para outra</small></button>`
+  : `<div class="hello"><h1>${greet}${nome}</h1><p>${esc(S.profile.foco || '')}</p></div>`}
   ${!S.goalsSet ? `<div class="insight" style="margin-bottom:12px"><b>Vamos calcular suas metas?</b> Informe idade, altura e peso em Ajustes para o app sugerir calorias e macros.<div style="margin-top:10px"><button class="btn pri sm" data-act="tab" data-k="more">Calcular minhas metas</button></div></div>` : ''}
   ${kcalCard(tot, 'Nutrição de hoje', `<button class="link" data-act="tab" data-k="diet">Abrir diário</button>`)}
   <div class="card">
@@ -1018,7 +1090,7 @@ function sheetQty({ food, meal, item }) {
       const mk = $('#qm').value;
       dayObj(UI.dDate)[mk].push({ id: uid(), fid: food.id, n: food.nome + (food.marca ? ` (${food.marca})` : ''), q: Math.round(g * 10) / 10, base: food.base, kcal: food.kcal, p: food.p, c: food.c, g: food.g });
     }
-    save(); closeSheet(); render(); toast(item ? 'Atualizado' : 'Adicionado');
+    save(); closeSheet(); render(); item ? toast('Atualizado') : funToast('food', 'Adicionado');
   };
 }
 function sheetFoods() {
@@ -1286,7 +1358,7 @@ function sheetCardio(id) {
     const o = { date: $('#c_d').value || today(), tipo: $('#c_t').value, min: parseInt($('#c_m').value) || 0, int: $('#c_i').value, incl: num($('#c_in').value) || '', vel: num($('#c_v').value) || '', nota: $('#c_n').value.trim() };
     if (!o.min) return toast('Informe a duração');
     if (id) Object.assign(S.cardio.find(x => x.id === id), o); else S.cardio.push({ id: uid(), ...o });
-    save(); closeSheet(); render(); toast('Cardio salvo');
+    save(); closeSheet(); render(); funToast('cardio', 'Cardio salvo');
   };
 }
 
@@ -1363,7 +1435,7 @@ function sheetMeasure(kind, date) {
     if (!(v > 0)) return toast('Informe um valor');
     const i = list.findIndex(x => x.date === (ex && date ? ex.date : d)); if (i >= 0) list.splice(i, 1);
     const j = list.findIndex(x => x.date === d); if (j >= 0) list.splice(j, 1);
-    list.push({ date: d, [key]: v }); save(); closeSheet(); render(); toast('Salvo');
+    list.push({ date: d, [key]: v }); save(); closeSheet(); render(); isW ? funToast('weight', 'Salvo') : toast('Salvo');
   };
 }
 async function handlePhoto(file, pose) {
@@ -1410,6 +1482,10 @@ function vMore() {
     <button class="btn block" data-act="saveProfile">Salvar perfil</button></div>
   <div class="card"><h3>Lembretes no início</h3>
     ${sw('rem.peso', rem.peso, 'Peso diário')}${sw('rem.cintura', rem.cintura, 'Cintura semanal')}${sw('rem.fotos', rem.fotos, 'Fotos a cada 15 dias')}${sw('rem.revisao', rem.revisao, 'Revisão aos domingos')}</div>
+  <div class="card"><h3>Modo divertido ${CUR === 'geovana' ? '🍑' : '😄'}</h3>
+    ${sw('fun', funOn(), 'Frases e comemorações', 'Saudação, frase do dia e festa ao terminar o treino')}
+    <div class="fld" style="margin-top:10px"><label>Minhas frases (uma por linha)</label><textarea id="fun_q" rows="3" placeholder="Ex.: Hoje é dia de brilhar ✨">${esc((S.prefs.funQuotes || []).join('\n'))}</textarea></div>
+    <button class="btn block" data-act="saveFunQ">Salvar frases</button></div>
   <div class="card"><h3>Treino</h3>${sw('rest', S.prefs.rest, 'Timer de descanso automático', 'Inicia ao concluir uma série')}${sw('sound', S.prefs.sound, 'Som e vibração no fim do descanso')}</div>
   ${syncCard()}
   <div class="card"><h3>Dados</h3>
@@ -1516,6 +1592,12 @@ const A = {
       s.ok = true;
       let ex; Object.values(S.plan).forEach(p => p.ex.forEach(e => { if (e.id === ds.ex) ex = e; }));
       startRest(ex ? +ex.descanso : 90);
+      if (funOn()) {
+        const plan = S.plan[parse(d).getDay()], lg = S.wlogs[d];
+        const all = plan.ex.every(e => (lg[e.id] || []).filter(x => x && x.ok).length >= (+e.series || 0));
+        const exAll = ex && (lg[ex.id] || []).filter(x => x && x.ok).length >= (+ex.series || 0);
+        if (all) { stopRest(); setTimeout(() => { celebrate(); toast(pickF(FUN.done)); }, 150); } else if (exAll) toast(pickF(FUN.exDone)); else toast(pickF(FUN.set));
+      }
     } else s.ok = false;
     save(); const y = window.scrollY; render(); window.scrollTo(0, y);
   },
@@ -1534,7 +1616,9 @@ const A = {
   loginWho: async ds => { if (ds.k !== CUR) { CUR = ds.k; try { localStorage.setItem(ACTIVE_KEY, CUR); } catch (e) { } S = load(CUR); save(false); await loadPhotos(); } hideLogin(); toast(`Olá, ${PROFILES[CUR].nome}!`); },
   scan: ds => sheetScan(ds.m),
   report: ds => sheetReport(ds && ds.ws),
-  water: ds => { const x = ((S.daily ||= {})[today()] ||= {}); x.agua = Math.max(0, (x.agua || 0) + +ds.n); save(); const y = scrollY; render(); scrollTo(0, y); },
+  water: ds => { const x = ((S.daily ||= {})[today()] ||= {}); x.agua = Math.max(0, (x.agua || 0) + +ds.n); save(); const y = scrollY; render(); scrollTo(0, y); if (+ds.n > 0 && funOn()) { toast(pickF(FUN.water)); if (x.agua >= waterGoal(S) && x.agua - +ds.n < waterGoal(S)) celebrate(['💧', '💦', '✨', '💖']); } },
+  nextQuote: () => { UI.qOff = (UI.qOff || 0) + 1; const el = $('.fun-q b'); if (el) { el.textContent = dailyQuote(); el.parentElement.classList.remove('pop'); void el.offsetWidth; el.parentElement.classList.add('pop'); } },
+  saveFunQ: () => { S.prefs.funQuotes = $('#fun_q').value.split('\n').map(x => x.trim()).filter(Boolean); save(); toast('Frases salvas 💖'); },
   steps: () => {
     const x = ((S.daily ||= {})[today()] ||= {});
     openSheet(`<h2>Passos de hoje</h2><div class="fld"><label>Total de passos (veja no app de saúde do celular)</label><input id="st_v" inputmode="numeric" value="${x.passos || ''}"></div><button class="btn pri block" id="st_ok">Salvar</button>`);
@@ -1620,12 +1704,44 @@ document.addEventListener('input', e => { if (e.target.id && e.target.id.startsW
 document.addEventListener('change', e => {
   if (e.target.id && e.target.id.startsWith('k_')) updCalc();
   const t = e.target;
-  if (t.dataset.pref) { const p = t.dataset.pref.split('.'); if (p.length === 2) S.prefs[p[0]][p[1]] = t.checked; else S.prefs[p[0]] = t.checked; save(); }
+  if (t.dataset.pref) { const p = t.dataset.pref.split('.'); if (p.length === 2) S.prefs[p[0]][p[1]] = t.checked; else S.prefs[p[0]] = t.checked; save(); if (p[0] === 'fun') toast(t.checked ? 'Modo divertido ligado 🎉' : 'Modo divertido desligado'); }
   if (t.dataset.cmp) { const k = t.dataset.cmp; if (k === 'pose') { UI.cmpPose = t.value; UI.cmpA = UI.cmpB = null; } else UI[k === 'a' ? 'cmpA' : 'cmpB'] = t.value; render(); }
 });
 $('#filePhoto').addEventListener('change', e => handlePhoto(e.target.files[0], photoPose));
 $('#fileImport').addEventListener('change', e => { const f = e.target.files[0]; if (f) confirmSheet('Importar backup?', 'Os dados atuais deste aparelho serão substituídos pelos do arquivo.', 'Importar', () => doImport(f)); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheetWrap').hidden) closeSheet(); });
+
+// ---------- teclado no celular ----------
+const isText = el => el && ((el.tagName === 'INPUT' && !/checkbox|radio|file|button|submit/.test(el.type)) || el.tagName === 'TEXTAREA');
+function vvUpdate() {
+  const v = window.visualViewport, root = document.documentElement.style;
+  if (!v) return;
+  const kb = Math.max(0, Math.round(window.innerHeight - v.height - v.offsetTop));
+  root.setProperty('--kb', kb + 'px'); root.setProperty('--vvh', Math.round(v.height) + 'px');
+}
+if (window.visualViewport) { visualViewport.addEventListener('resize', vvUpdate); visualViewport.addEventListener('scroll', vvUpdate); vvUpdate(); }
+let kbT;
+document.addEventListener('focusin', e => {
+  if (!isText(e.target)) return;
+  clearTimeout(kbT); document.body.classList.add('kb');
+  const el = e.target;
+  setTimeout(() => { vvUpdate(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 320);
+});
+document.addEventListener('focusout', () => { kbT = setTimeout(() => { if (!isText(document.activeElement)) { document.body.classList.remove('kb'); vvUpdate(); } }, 120); });
+// "Enter" do teclado: vai para o próximo campo ou confirma
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || !isText(e.target) || e.target.closest('form')) return;
+  const scope = e.target.closest('#sheet') || e.target.closest('.ex') || document;
+  const fields = $$('input:not([type=checkbox]):not([type=file]):not([disabled]), select, textarea', scope).filter(x => x.offsetParent !== null);
+  const i = fields.indexOf(e.target);
+  e.preventDefault();
+  if (e.target.id === 'fq') return e.target.blur();
+  if (i >= 0 && i < fields.length - 1 && fields[i + 1].tagName === 'INPUT') return fields[i + 1].focus();
+  const pri = scope !== document && $('.btn.pri', scope);
+  e.target.blur(); if (pri && scope.id === 'sheet') pri.click();
+});
+// dicas de tecla Enter
+new MutationObserver(() => $$('input:not([enterkeyhint])').forEach(i => i.setAttribute('enterkeyhint', i.id === 'fq' ? 'search' : 'next'))).observe(document.body, { childList: true, subtree: true });
 
 // ---------- PWA ----------
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__installPrompt = e; if (UI.tab === 'more') render(); });
